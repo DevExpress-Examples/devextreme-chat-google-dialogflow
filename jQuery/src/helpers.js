@@ -65,7 +65,7 @@ export async function processMessageSending(text, instance, customStore) {
   }
 }
 
-export async function regenerate(instance) {
+export async function regenerate(instance, customStore) {
   toggleDisabledState(true, instance);
 
   try {
@@ -73,9 +73,9 @@ export async function regenerate(instance) {
     const lastUserMessage = items.filter((item) => item.author.id === user.id).at(-1);
     const aiResponse = await getAIResponse(lastUserMessage.text);
 
-    updateLastMessage(aiResponse);
+    updateLastMessage(aiResponse, customStore, instance);
   } catch (error) {
-    updateLastMessage(lastMessageText);
+    updateLastMessage(lastMessageText, customStore, instance);
     pushAlert(error, instance);
   } finally {
     toggleDisabledState(false, instance);
@@ -92,7 +92,7 @@ function renderMessage(text, customStore) {
   customStore.push([{ type: 'insert', data: message }]);
 }
 
-export function updateLastMessage(text, customStore) {
+export function updateLastMessage(text, customStore, instance) {
   const { items } = instance.option();
   const lastMessage = items.at(-1);
 
@@ -101,7 +101,7 @@ export function updateLastMessage(text, customStore) {
   const data = {
     text: text ?? REGENERATION_TEXT,
   };
-
+  console.log(data)
   customStore.push([{
     type: 'update',
     key: lastMessage.id,

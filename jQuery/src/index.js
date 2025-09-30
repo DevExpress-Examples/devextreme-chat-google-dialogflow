@@ -39,7 +39,6 @@ $(() => {
     showAvatar: false,
     showDayHeaders: false,
     user,
-    height: 710,
     onMessageEntered: (e) => {
       const { message } = e;
 
@@ -84,8 +83,8 @@ $(() => {
           stylingMode: 'text',
           hint: 'Regenerate',
           onClick: () => {
-            updateLastMessage('', customStore);
-            regenerate(instance);
+            updateLastMessage(null, customStore, instance);
+            regenerate(instance, customStore);
           },
         })
         .appendTo($buttonContainer);

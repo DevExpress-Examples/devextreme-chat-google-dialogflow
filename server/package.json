@@ -1,0 +1,13 @@
+{
+  "name": "dx-server",
+  "scripts": {
+    "start:server": "node server.js"
+  },
+  "dependencies": {
+    "@google-cloud/dialogflow": "^7.2.0",
+    "body-parser": "^2.2.0",
+    "browser-sync": "^3.0.2",
+    "express": "^5.0.0",
+    "path": "^0.12.7"
+  }
+}
