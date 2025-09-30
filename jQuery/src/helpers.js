@@ -101,7 +101,7 @@ export function updateLastMessage(text, customStore, instance) {
   const data = {
     text: text ?? REGENERATION_TEXT,
   };
-  console.log(data)
+
   customStore.push([{
     type: 'update',
     key: lastMessage.id,
