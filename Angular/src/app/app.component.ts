@@ -11,7 +11,7 @@ import { AppService } from './app.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  dataSource: DataSource | undefined;
+  dataSource: DataSource | [];
 
   user: DxChatTypes.User;
 
@@ -28,7 +28,7 @@ export class AppComponent {
   constructor(private readonly appService: AppService) {
     loadMessages(this.appService.getDictionary());
 
-    this.dataSource = this.appService.dataSource;
+    this.dataSource = this.appService.dataSource ?? [];
     this.user = this.appService.user;
     this.alerts$ = this.appService.alerts$;
     this.typingUsers$ = this.appService.typingUsers$;
