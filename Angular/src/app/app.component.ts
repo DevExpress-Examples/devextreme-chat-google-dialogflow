@@ -11,7 +11,7 @@ import { AppService } from './app.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  dataSource: DataSource;
+  dataSource: DataSource | undefined;
 
   user: DxChatTypes.User;
 
