@@ -1,31 +1,30 @@
-import { Injectable } from "@angular/core";
-import { Observable, BehaviorSubject } from "rxjs";
-import { unified } from "unified";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
+import { Injectable } from '@angular/core';
+import { Observable, BehaviorSubject } from 'rxjs';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
 import { type DxChatTypes } from 'devextreme-angular/ui/chat';
-import { DataSource } from 'devextreme-angular/common/data';
-import { CustomStore } from 'devextreme-angular/common/data';
+import { DataSource, CustomStore } from 'devextreme-angular/common/data';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AppService {
+  REGENERATION_TEXT = 'Regeneration...';
 
-  REGENERATION_TEXT = "Regeneration...";
   sessionId: string;
 
   user: DxChatTypes.User = {
-    id: "user",
+    id: 'user',
   };
 
   assistant: DxChatTypes.User = {
-    id: "assistant",
-    name: "Virtual Assistant",
+    id: 'assistant',
+    name: 'Virtual Assistant',
   };
 
-  store: Array<{ id: number; timestamp: Date; author: DxChatTypes.User; text: string }> = [];
+  store: { id: number; timestamp: Date; author: DxChatTypes.User; text: string }[] = [];
 
   messages: any = [];
 
@@ -56,41 +55,39 @@ export class AppService {
     return this.alertsSubject.asObservable();
   }
 
-  getDictionary() {
+  getDictionary(): { en: Record<string, string> } {
     return {
       en: {
-        "dxChat-emptyListMessage": "Chat is Empty",
-        "dxChat-emptyListPrompt":
-          "AI Assistant is ready to answer your questions.",
-        "dxChat-textareaPlaceholder": "Ask AI Assistant...",
+        'dxChat-emptyListMessage': 'Chat is Empty',
+        'dxChat-emptyListPrompt':
+          'AI Assistant is ready to answer your questions.',
+        'dxChat-textareaPlaceholder': 'Ask AI Assistant...',
       },
     };
   }
-  toggleDisabledState(disabled: boolean, event?: { target?: EventTarget } | undefined) {
+
+  toggleDisabledState(disabled: boolean, event?: { target?: EventTarget } | undefined): void {
     const element = event?.target as HTMLElement;
 
     if (element) {
       disabled ? element.blur() : element.focus();
     }
   }
-  initDataSource() {
+
+  initDataSource(): void {
     this.customStore = new CustomStore({
-      key: "id",
-      load: () => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve([...this.store]);
-          }, 0);
+      key: 'id',
+      load: () => new Promise((resolve): void => {
+        setTimeout(() => {
+          resolve([...this.store]);
+        }, 0);
+      }),
+      insert: (message) => new Promise((resolve): void => {
+        setTimeout(() => {
+          this.store.push(message);
+          resolve(message);
         });
-      },
-      insert: (message) => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            this.store.push(message);
-            resolve(message);
-          });
-        });
-      },
+      }),
     });
 
     this.dataSource = new DataSource({
@@ -99,7 +96,7 @@ export class AppService {
     });
   }
 
-  async getAIResponse(text: string | undefined) {
+  async getAIResponse(text: string | undefined): Promise<string> {
     let id = this.sessionId;
 
     const response = await fetch('http://localhost:3000/webhook', {
@@ -110,12 +107,12 @@ export class AppService {
       body: JSON.stringify({ message: text, sessionId: id }),
     });
 
-    const data = await response.json();
+    const data: { response: string } = await response.json();
 
     return data.response;
   }
 
-  async processMessageSending(e: DxChatTypes.MessageEnteredEvent) {
+  async processMessageSending(e: DxChatTypes.MessageEnteredEvent): Promise<void> {
     let { message } = e;
     this.toggleDisabledState(true, e.event);
 
@@ -125,7 +122,7 @@ export class AppService {
 
       setTimeout(() => {
         this.typingUsersSubject.next([]);
-        this.renderAssistantMessage(aiResponse ?? "");
+        this.renderAssistantMessage(aiResponse ?? '');
       }, 200);
     } catch (error) {
       this.typingUsersSubject.next([]);
@@ -135,7 +132,7 @@ export class AppService {
     }
   }
 
-  updateLastMessage(text?: string | null | undefined) {
+  updateLastMessage(text?: string | null | undefined): void {
     const items = this.dataSource?.items();
     const lastMessage = items?.at(-1);
 
@@ -143,17 +140,17 @@ export class AppService {
 
     const data = {
       text: text ?? this.REGENERATION_TEXT,
-    }
+    };
     this.dataSource?.store().push([
       {
-        type: "update",
+        type: 'update',
         key: lastMessage.id,
-        data: data,
+        data,
       },
     ]);
   }
 
-  renderAssistantMessage(text: string | null) {
+  renderAssistantMessage(text: string | null): void {
     const message = {
       id: Date.now(),
       timestamp: new Date(),
@@ -161,10 +158,10 @@ export class AppService {
       text,
     };
 
-    this.dataSource?.store().push([{ type: "insert", data: message }]);
+    this.dataSource?.store().push([{ type: 'insert', data: message }]);
   }
 
-  alertLimitReached(error: any) {
+  alertLimitReached(error: any): void {
     this.setAlerts([
       {
         message: error.message,
@@ -176,14 +173,13 @@ export class AppService {
     }, 10000);
   }
 
-  setAlerts(alerts: DxChatTypes.Alert[]) {
+  setAlerts(alerts: DxChatTypes.Alert[]): void {
     this.alerts = alerts;
     this.alertsSubject.next(alerts);
   }
 
-  async regenerate() {
+  async regenerate(): Promise<void> {
     try {
-
       const aiResponse = await this.getAIResponse(this.lastMessageText);
 
       this.updateLastMessage(aiResponse);
@@ -201,7 +197,7 @@ export class AppService {
     }
   }
 
-  convertToHtml(value: string) {
+  convertToHtml(value: string): string {
     const result = unified()
       .use(remarkParse)
       .use(remarkRehype)
@@ -212,13 +208,13 @@ export class AppService {
     return result;
   }
 
-  async onMessageEntered(event: DxChatTypes.MessageEnteredEvent) {
+  async onMessageEntered(event: DxChatTypes.MessageEnteredEvent): Promise<void> {
     let { message } = event;
     this.dataSource
       ?.store()
-      .push([{ type: "insert", data: { id: Date.now(), ...message } }]);
+      .push([{ type: 'insert', data: { id: Date.now(), ...message } }]);
 
-    this.messages.push({ role: "user", content: message?.text ?? "" });
+    this.messages.push({ role: 'user', content: message?.text ?? '' });
     await this.processMessageSending(event);
   }
 }
