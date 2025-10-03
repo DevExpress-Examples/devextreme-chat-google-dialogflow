@@ -111,13 +111,10 @@ class AppService {
     };
     this.lastMessageText = text ? '' : lastMessage.text;
 
-    this.dataSource?.store().push([{ type: 'remove', key: lastMessage.id }]);
-    this.dataSource?.store().push([
-      {
-        type: 'insert',
-        data: { ...lastMessage, ...data },
-      },
-    ]);
+    this.dataSource?.store().push([{ type: 'remove', key: lastMessage.id }, {
+      type: 'insert',
+      data: { ...lastMessage, ...data },
+    }]);
   }
 
   renderAssistantMessage(text: string | null): void {
@@ -152,13 +149,13 @@ class AppService {
     try {
       const aiResponse = await this.getAIResponse(this.lastMessageText);
       this.updateLastMessage(aiResponse);
-      const lastMsg = this.messages.at(-1);
+      const lastMsg = this.messages.slice(-1)[0];
       if (lastMsg) {
         lastMsg.content = aiResponse ?? '';
         this.messages = [...this.messages];
       }
     } catch (error) {
-      const lastMsg = this.messages.at(-1);
+      const lastMsg = this.messages.slice(-1)[0];
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
       }
