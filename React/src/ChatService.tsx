@@ -163,7 +163,7 @@ class AppService {
     }
   }
 
-  async onMessageEntered(event: ChatTypes.MessageEnteredEvent, setDisabled: Function): void {
+  async onMessageEntered(event: ChatTypes.MessageEnteredEvent, setDisabled: Function): Promise<void> {
     let { message } = event;
     this.dataSource
       ?.store()
