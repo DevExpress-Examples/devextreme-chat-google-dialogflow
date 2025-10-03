@@ -1,5 +1,6 @@
 {
   "name": "dx-server",
+  "type": "module",
   "scripts": {
     "start:server": "node server.js"
   },
