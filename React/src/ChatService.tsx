@@ -105,7 +105,7 @@ class AppService {
 
   updateLastMessage(text?: string | null | undefined): void {
     const items = this.dataSource?.items();
-    const lastMessage = items?.at(-1);
+    const lastMessage = items?.slice(-1)[0];
     const data = {
       text: text ?? 'Regeneration...',
     };
