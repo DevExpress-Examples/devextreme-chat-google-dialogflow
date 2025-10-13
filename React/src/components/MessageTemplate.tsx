@@ -20,7 +20,7 @@ function convertToHtml(value: string): string {
 
 interface MessageProps {
   text: string;
-  onRegenerateButtonClick: ButtonTypes.ClickEvent;
+  onRegenerateButtonClick: ButtonTypes.Properties['onClick'];
 }
 
 function MessageTemplate({ text, onRegenerateButtonClick }: MessageProps): JSX.Element {
