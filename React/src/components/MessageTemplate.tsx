@@ -5,8 +5,7 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import rehypeStringify from 'rehype-stringify';
 import HTMLReactParser from 'html-react-parser';
-
-import { type Properties as dxButtonProperties } from 'devextreme/ui/button';
+import { type ButtonTypes } from 'devextreme-react/button';
 
 function convertToHtml(value: string): string {
   const result = unified()
@@ -21,7 +20,7 @@ function convertToHtml(value: string): string {
 
 interface MessageProps {
   text: string;
-  onRegenerateButtonClick: dxButtonProperties['onClick'];
+  onRegenerateButtonClick: ButtonTypes.ClickEvent;
 }
 
 function MessageTemplate({ text, onRegenerateButtonClick }: MessageProps): JSX.Element {
