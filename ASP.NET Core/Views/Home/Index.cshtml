@@ -2,7 +2,7 @@
 
 @(Html.DevExtreme().Chat()
     .ID("dx-ai-chat")
-    .User(user => user.Id(Model.CurrentUser.Id))
+    .User(user => user.Id(Model.Id))
     .DataSource(new JS("customStore"))
     .ReloadOnChange(false)
     .ShowAvatar(false)
