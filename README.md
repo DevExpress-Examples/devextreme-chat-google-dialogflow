@@ -7,13 +7,13 @@
 
 This repository contains code referenced in the following DevExtreme help topic: [Integrate with AI Service - Google Dialogflow](https://js.devexpress.com/Documentation/Guide/UI_Components/Chat/Integrate_with_AI_Service/#Google_Dialogflow).
 
-This example integrates DevExtreme Chat with [Google Dialogflow](https://cloud.google.com/dialogflow/docs).
+This example integrates [Google Dialogflow](https://cloud.google.com/dialogflow/docs) into DevExtreme Chat.
 
 <div align="center"><img src="./images/chat-dialogflow.png" /></div>
 
 ## How to Run the Example
 
-This instruction is applicable to all **client** applications in this repository (jQuery, Angular, Vue, or React). For the ASP.NET Core example, follow the instructions 1-3 below, and then refer to the [ASP.NET Core Readme.md](ASP.NET%20Core/Readme.md) file.
+Follow these instructions to run **client** applications available in this repository (jQuery, Angular, Vue, or React). To run the ASP.NET Core example, follow steps 1-3, and then refer to [ASP.NET Core Readme.md](ASP.NET%20Core/Readme.md).
 
 1. Clone the repository and navigate to the example folder.
 2. Replace the placeholder in the `key.json` file with your Dialogflow API key.
