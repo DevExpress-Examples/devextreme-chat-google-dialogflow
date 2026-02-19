@@ -1,6 +1,6 @@
 # ASP.NET Core DevExtreme Example
 
-For more information about this example check the [Readme](../README.md).
+Instructions below are specific to the ASP.NET Core example. Before you follow these instructions, start with the common steps described in this example's [README](../README.md).
 
 ## Build and Run
 
@@ -27,4 +27,4 @@ Client-side API basics:
 * Call methods: https://js.devexpress.com/DevExtreme/Guide/jQuery_Components/Component_Configuration_Syntax/#Call_Methods
 * Get instance: https://js.devexpress.com/DevExtreme/Guide/jQuery_Components/Component_Configuration_Syntax/#Get_a_UI_Component_Instance
 
-To get more help with DevExtreme, submit a ticket through the [Support Center](https://supportcenter.devexpress.com/ticket/create).
+For technical support, submit a ticket to the [DevExpress Support Center](https://supportcenter.devexpress.com/ticket/create).
