@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Chat from './components/ChartInterface.vue';
+import Chat from './components/ChatInterface.vue';
 import 'devextreme/dist/css/dx.fluent.blue.light.css';
 </script>
 
