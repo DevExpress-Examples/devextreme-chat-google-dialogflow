@@ -35,7 +35,7 @@ Follow these instructions to run **client** applications available in this repos
 
 - **jQuery**
     - [index.js](jQuery/src/index.js)
-    - [helper.js](jQuery/src/helper.js)
+    - [helpers.js](jQuery/src/helpers.js)
 - **Angular**
     - [app.component.html](Angular/src/app/app.component.html)
     - [app.component.ts](Angular/src/app/app.component.ts)
