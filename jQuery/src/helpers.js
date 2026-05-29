@@ -111,7 +111,9 @@ export function updateLastMessage(text, customStore, instance) {
 export function convertToHtml(value) {
   const result = unified()
     .use(remarkParse)
+    // eslint-disable-next-line spellcheck/spell-checker
     .use(remarkRehype)
+    // eslint-disable-next-line spellcheck/spell-checker
     .use(rehypeStringify)
     .processSync(value)
     .toString();

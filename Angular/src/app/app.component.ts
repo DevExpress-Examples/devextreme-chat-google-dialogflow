@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
+import { NgIf, AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
 import { type DxChatTypes } from 'devextreme-angular/ui/chat';
 import { DataSource } from 'devextreme-angular/common/data';
 import { loadMessages } from 'devextreme/localization';
 import { AppService } from './app.service';
-import { DxButtonModule, DxChatModule } from 'devextreme-angular';
+import { DxButtonModule, DxChatModule, DxTemplateModule } from 'devextreme-angular';
 
 @Component({
-  imports: [DxButtonModule, DxChatModule],
+  imports: [DxButtonModule, DxChatModule, DxTemplateModule, NgIf, AsyncPipe],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
