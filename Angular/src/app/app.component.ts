@@ -4,8 +4,10 @@ import { type DxChatTypes } from 'devextreme-angular/ui/chat';
 import { DataSource } from 'devextreme-angular/common/data';
 import { loadMessages } from 'devextreme/localization';
 import { AppService } from './app.service';
+import { DxButtonModule, DxChatModule } from 'devextreme-angular';
 
 @Component({
+  imports: [DxButtonModule, DxChatModule],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
