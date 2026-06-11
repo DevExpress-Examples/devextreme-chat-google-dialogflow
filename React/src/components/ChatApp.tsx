@@ -24,7 +24,6 @@ export default function ChatApp(): JSX.Element {
     appService.onMessageEntered(e, setDisabled);
   }, [isDisabled]);
 
-  /* eslint-disable space-before-function-paren */
   const onRegenerateButtonClick = useCallback(async (): Promise<void> => {
     setDisabled(true);
     appService.updateLastMessage();
