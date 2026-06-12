@@ -27,8 +27,8 @@
   "dependencies": {
     "@google-cloud/dialogflow": "^7.2.0",
     "body-parser": "^2.2.0",
-    "devextreme": "26.1.2-beta",
-    "devextreme-dist": "26.1.2-beta",
+    "devextreme": "26.1.3",
+    "devextreme-dist": "26.1.3",
     "express": "^5.0.0",
     "jquery": "^3.7.1",
     "path": "^0.12.7",
