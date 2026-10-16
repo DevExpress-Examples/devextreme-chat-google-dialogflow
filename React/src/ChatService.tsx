@@ -12,6 +12,8 @@ class AppService {
 
   alerts: ChatTypes.Alert[] = [];
 
+  alertTimeoutId: ReturnType<typeof setTimeout> | undefined;
+
   customStore?: CustomStore;
 
   dataSource?: DataSource;
@@ -76,13 +78,22 @@ class AppService {
       body: JSON.stringify({ message: text, sessionId: id }),
     });
 
-    const data: { response: string } = await response.json();
+    const data: { response?: string; error?: string } = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || response.statusText || `Request failed with status ${response.status}`);
+    }
+
+    if (typeof data.response !== 'string') {
+      throw new Error('Invalid response from server');
+    }
 
     return data.response;
   }
 
   async processMessageSending(setDisabled: Function, e: ChatTypes.MessageEnteredEvent): Promise<void> {
     let { message } = e;
+    this.clearAlerts();
     setDisabled(true);
     (e.event?.target as HTMLElement).blur();
     this.typingUsersSubject.next([assistant]);
@@ -93,10 +104,10 @@ class AppService {
         this.typingUsersSubject.next([]);
         this.renderAssistantMessage(aiResponse ?? '');
       }, 200);
-    } catch (error) {
+    } catch (error: unknown) {
       (e.event?.target as HTMLElement).focus();
       this.typingUsersSubject.next([]);
-      this.alertLimitReached(error);
+      this.alertError(this.getErrorMessage(error));
     } finally {
       (e.event?.target as HTMLElement).focus();
       setDisabled(false);
@@ -128,14 +139,26 @@ class AppService {
     this.dataSource?.store().push([{ type: 'insert', data: message }]);
   }
 
-  alertLimitReached(error: any): void {
+  getErrorMessage(error: unknown): string {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    return 'Unknown error';
+  }
+
+  clearAlerts(): void {
+    clearTimeout(this.alertTimeoutId);
+    this.setAlerts([]);
+  }
+
+  alertError(message: string): void {
+    this.clearAlerts();
     this.setAlerts([
       {
-        message: error.message,
+        message,
       },
     ]);
 
-    setTimeout((): void => {
+    this.alertTimeoutId = setTimeout((): void => {
       this.setAlerts([]);
     }, ALERT_TIMEOUT);
   }
@@ -146,6 +169,7 @@ class AppService {
   }
 
   async regenerate(): Promise<void> {
+    this.clearAlerts();
     try {
       const aiResponse = await this.getAIResponse(this.lastMessageText);
       this.updateLastMessage(aiResponse);
@@ -154,12 +178,12 @@ class AppService {
         lastMsg.content = aiResponse ?? '';
         this.messages = [...this.messages];
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const lastMsg = this.messages.slice(-1)[0];
       if (lastMsg) {
         this.updateLastMessage(lastMsg.content);
       }
-      this.alertLimitReached(error);
+      this.alertError(this.getErrorMessage(error));
     }
   }
 

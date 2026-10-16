@@ -16,30 +16,26 @@ const sessionClient = new SessionsClient({
 const projectId = 'agent-ncfh';
 
 async function detectIntent(message, sessionId) {
-  try {
-    const sessionPath = sessionClient.projectAgentSessionPath(projectId, sessionId);
+  const sessionPath = sessionClient.projectAgentSessionPath(projectId, sessionId);
 
-    const params = {
-      session: sessionPath,
-      queryInput: {
-        text: {
-          text: message,
-          languageCode: 'en',
-        },
+  const params = {
+    session: sessionPath,
+    queryInput: {
+      text: {
+        text: message,
+        languageCode: 'en',
       },
-    };
+    },
+  };
 
-    const responses = await sessionClient.detectIntent(params);
-    const result = responses[0]?.queryResult;
+  const responses = await sessionClient.detectIntent(params);
+  const result = responses[0]?.queryResult;
 
-    if (!result || !result.fulfillmentText) {
-      throw new Error('No response from Dialogflow');
-    }
-
-    return result.fulfillmentText;
-  } catch (error) {
-    throw new Error('Failed to process message in Dialogflow');
+  if (!result || !result.fulfillmentText) {
+    throw new Error('No response from Dialogflow');
   }
+
+  return result.fulfillmentText;
 }
 
 export default detectIntent;

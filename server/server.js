@@ -43,7 +43,8 @@ app.post('/webhook', async (request, response) => {
 
     return response.json({ response: result });
   } catch (error) {
-    return response.status(500).json({ error: 'Error processing request' });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return response.status(500).json({ error: errorMessage });
   }
 });
 

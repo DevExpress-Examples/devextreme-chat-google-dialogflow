@@ -20,6 +20,7 @@
 
     let instance = null;
     let lastMessageText = '';
+    let alertTimeoutId;
 
     const user = {
         id: 'user',
@@ -135,6 +136,15 @@
         });
 
         const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || response.statusText || `Request failed with status ${response.status}`);
+        }
+
+        if (typeof data.response !== 'string') {
+            throw new Error('Invalid response from server');
+        }
+
         return data.response;
     }
 
@@ -153,6 +163,7 @@
     }
 
     async function processMessageSending(text) {
+        clearAlerts();
         toggleDisabledState(true);
         instance.option({ typingUsers: [assistant] });
 
@@ -165,13 +176,14 @@
             }, 200);
         } catch (error) {
             instance.option({ typingUsers: [] });
-            pushAlert(error);
+            pushAlert(getErrorMessage(error));
         } finally {
             toggleDisabledState(false);
         }
     }
 
     async function onRegenerateButtonClick() {
+        clearAlerts();
         updateLastMessage(null);
         toggleDisabledState(true);
 
@@ -185,7 +197,7 @@
             updateLastMessage(aiResponse);
         } catch (error) {
             updateLastMessage(lastMessageText);
-            pushAlert(error);
+            pushAlert(getErrorMessage(error));
         } finally {
             toggleDisabledState(false);
         }
@@ -233,14 +245,27 @@
         return result;
     }
 
-    function pushAlert(error) {
+    function getErrorMessage(error) {
+        if (error instanceof Error) return error.message;
+        if (typeof error === 'string') return error;
+        return 'Unknown error';
+    }
+
+    function clearAlerts() {
+        clearTimeout(alertTimeoutId);
+        instance.option({ alerts: [] });
+    }
+
+    function pushAlert(message) {
+        clearAlerts();
+
         instance.option({
             alerts: [{
-                message: error.message,
+                message,
             }],
         });
 
-        setTimeout(() => {
+        alertTimeoutId = setTimeout(() => {
             instance.option({ alerts: [] });
         }, 10000);
     }

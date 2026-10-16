@@ -14,6 +14,7 @@ const assistant: DxChatTypes.User = { id: 'assistant', name: 'Virtual Assistant'
 export function useChatLogic() {
   const sessionId: string = Math.random().toString(36).substring(7);
   let lastMessageText: string = '';
+  let alertTimeoutId: ReturnType<typeof setTimeout> | undefined;
   const dataSource = ref<DataSource | null>(null);
   const user = ref({ id: 'user' });
   const typingUsers = ref<Array<DxChatTypes.User>>([]);
@@ -57,13 +58,22 @@ export function useChatLogic() {
       body: JSON.stringify({ message: text, sessionId: id }),
     });
 
-    const data: { response: string } = await response.json();
+    const data: { response?: string; error?: string } = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || response.statusText || `Request failed with status ${response.status}`);
+    }
+
+    if (typeof data.response !== 'string') {
+      throw new Error('Invalid response from server');
+    }
 
     return data.response;
   };
 
   const processMessageSending = async(e: DxChatTypes.MessageEnteredEvent) => {
     let { message } = e;
+    clearAlerts();
     toggleDisabledState(true);
     (e.event?.target as HTMLElement).blur();
     typingUsers.value = [assistant];
@@ -74,10 +84,10 @@ export function useChatLogic() {
         typingUsers.value = [];
         renderAssistantMessage(aiResponse ?? '');
       }, 200);
-    } catch(error) {
+    } catch(error: unknown) {
       (e.event?.target as HTMLElement).focus();
       typingUsers.value = [];
-      alertLimitReached(error);
+      alertError(getErrorMessage(error));
     } finally {
       (e.event?.target as HTMLElement).focus();
       toggleDisabledState(false);
@@ -110,9 +120,21 @@ export function useChatLogic() {
     dataSource.value?.store().push([{ type: 'insert', data: message }]);
   };
 
-  const alertLimitReached = (error: any) => {
-    setAlerts([{ message: error.message }]);
-    setTimeout(() => setAlerts([]), ALERT_TIMEOUT);
+  const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) return error.message;
+    if (typeof error === 'string') return error;
+    return 'Unknown error';
+  };
+
+  const clearAlerts = () => {
+    clearTimeout(alertTimeoutId);
+    setAlerts([]);
+  };
+
+  const alertError = (message: string) => {
+    clearAlerts();
+    setAlerts([{ message }]);
+    alertTimeoutId = setTimeout(clearAlerts, ALERT_TIMEOUT);
   };
 
   const setAlerts = (newAlerts: DxChatTypes.Alert[]) => {
@@ -120,6 +142,7 @@ export function useChatLogic() {
   };
 
   const regenerate = async() => {
+    clearAlerts();
     try {
       const aiResponse = await getAIResponse(lastMessageText);
       updateLastMessage(aiResponse);
@@ -128,10 +151,10 @@ export function useChatLogic() {
         lastMsg.content = aiResponse ?? '';
         messages.value = [...messages.value];
       }
-    } catch(error) {
+    } catch(error: unknown) {
       const lastMsg = messages.value.slice(-1)[0];
       if (lastMsg) updateLastMessage(lastMsg.content);
-      alertLimitReached(error);
+      alertError(getErrorMessage(error));
     }
   };
 
