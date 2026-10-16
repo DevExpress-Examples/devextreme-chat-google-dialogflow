@@ -6,6 +6,7 @@ import {
 } from './data.js';
 
 let lastMessageText = '';
+let alertTimeoutId;
 
 export function loadMessages() {
   DevExpress.localization.loadMessages({
@@ -27,6 +28,14 @@ async function getAIResponse(text) {
 
   const data = await response.json();
 
+  if (!response.ok) {
+    throw new Error(data.error || response.statusText || `Request failed with status ${response.status}`);
+  }
+
+  if (typeof data.response !== 'string') {
+    throw new Error('Invalid response from server');
+  }
+
   return data.response;
 }
 function toggleDisabledState(disabled, instance) {
@@ -44,6 +53,7 @@ function toggleDisabledState(disabled, instance) {
 }
 
 export async function processMessageSending(text, instance, customStore) {
+  clearAlerts(instance);
   toggleDisabledState(true, instance);
 
   instance.option({ typingUsers: [assistant] });
@@ -59,13 +69,14 @@ export async function processMessageSending(text, instance, customStore) {
   } catch (error) {
     instance.option({ typingUsers: [] });
 
-    pushAlert(error, instance);
+    pushAlert(getErrorMessage(error), instance);
   } finally {
     toggleDisabledState(false, instance);
   }
 }
 
 export async function regenerate(instance, customStore) {
+  clearAlerts(instance);
   toggleDisabledState(true, instance);
 
   try {
@@ -76,7 +87,7 @@ export async function regenerate(instance, customStore) {
     updateLastMessage(aiResponse, customStore, instance);
   } catch (error) {
     updateLastMessage(lastMessageText, customStore, instance);
-    pushAlert(error, instance);
+    pushAlert(getErrorMessage(error), instance);
   } finally {
     toggleDisabledState(false, instance);
   }
@@ -120,14 +131,27 @@ export function convertToHtml(value) {
 
   return result;
 }
-function pushAlert(error, instance) {
+function getErrorMessage(error) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Unknown error';
+}
+
+function clearAlerts(instance) {
+  clearTimeout(alertTimeoutId);
+  instance.option({ alerts: [] });
+}
+
+function pushAlert(message, instance) {
+  clearAlerts(instance);
+
   instance.option({
     alerts: [{
-      message: error.message,
+      message,
     }],
   });
 
-  setTimeout(() => {
+  alertTimeoutId = setTimeout(() => {
     instance.option({ alerts: [] });
   }, 10000);
 }
